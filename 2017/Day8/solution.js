@@ -1,20 +1,25 @@
 function parseInstructions(arr) {
+	
+	var toOperation = x => {
+		return {
+			targetRegister: x[0],
+			operation: x[1],
+			value: +x[2],
+			conditionRegister: x[4],
+			conditionOperator: x[5],
+			conditionValue: x[6]
+		}
+	};
 	return arr.map(x => { 		
 		let split = x.split(" "); 
-		return {
-			targetRegister: split[0],
-			operation: split[1],
-			value: +split[2],
-			conditionRegister: split[4],
-			conditionOperator: split[5],
-			conditionValue: split[6]
-		}
+		return toOperation(split);
 	});
 }
 
 function executeInstructions(instructions) {
 	var registers = {
 	};
+	var maxValue = 0;
 	for (let instruction of instructions) {
 		var reg = instruction.targetRegister;
 		
@@ -34,26 +39,17 @@ function executeInstructions(instructions) {
 		var value = instruction.conditionValue;
 		var shouldPerformAction = false;
 		
-		console.log(op);
-		if(op == "<") {
-			if(regValue < value) {
-				shouldPerformAction = true;
-			}			
+		if(op == "<" && regValue < value) {
+			shouldPerformAction = true;		
 		}
-		if(op == "<=") {
-			if(regValue <= value) {
-				shouldPerformAction = true;
-			}	
+		if(op == "<=" && regValue <= value) {
+			shouldPerformAction = true;
 		}		
-		if(op == "==") {
-			if(regValue == value) {
-				shouldPerformAction = true;
-			}	
+		if(op == "==" && regValue == value) {
+			shouldPerformAction = true;
 		}
-		if(op == ">") {
-			if(regValue > value) {
-				shouldPerformAction = true;
-			}	
+		if(op == ">" && regValue > value) {
+			shouldPerformAction = true;
 		}
 		
 		if(op == ">=" && regValue >= value) {
@@ -72,10 +68,16 @@ function executeInstructions(instructions) {
 			}
 			else {
 				registers[reg] = registers[reg] - instruction.value;
-			}			
+			}
+
+			var currentValue = registers[reg];
+			if(currentValue > maxValue) {
+				maxValue = currentValue;
+			}
 		}
 	}
 	
+	console.log(maxValue);
 	return registers;
 }
 
